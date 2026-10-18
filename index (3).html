@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Học Tập Thông Minh — Giải Thích Kiến Thức</title>
+    <script>
+        // Áp dụng giao diện sáng/tối ngay lập tức để tránh bị nháy màn hình
+        (function () {
+            let theme = null;
+            try { theme = localStorage.getItem('theme'); } catch (e) {}
+            if (!theme) theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            if (theme === 'dark') document.documentElement.classList.add('dark');
+        })();
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563EB',
+                        primaryLight: '#3B82F6',
+                        primaryDark: '#1D4ED8',
+                        secondary: '#7C3AED',
+                        accent: '#06B6D4',
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        danger: '#EF4444',
+                        neutral: {
+                            50: '#F8FAFC',
+                            100: '#F1F5F9',
+                            200: '#E2E8F0',
+                            300: '#CBD5E1',
+                            700: '#334155',
+                            800: '#1E293B',
+                            900: '#0F172A'
+                        }
+                    },
+                    fontFamily: { sans: ['Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'system-ui', 'sans-serif'] },
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(37, 99, 235, 0.15)',
+                        'card': '0 4px 20px rgba(0,0,0,0.08)',
+                        'card-hover': '0 8px 30px rgba(37, 99, 235, 0.12)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html, body, button, input, textarea { font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', system-ui, sans-serif; }
+        .fa { font-family: FontAwesome !important; }
+        code, pre { font-family: ui-monospace, Menlo, Consolas, monospace; }
+        body { background: linear-gradient(135deg, #F0F4FF 0%, #F8FAFC 50%, #ECFDF5 100%); background-attachment: fixed; transition: background 0.3s, color 0.3s; }
+        .gradient-main { background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%); }
+        .gradient-text { background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .chat-bubble-user { border-radius: 20px 20px 6px 20px; }
+        .chat-bubble-ai { border-radius: 20px 20px 20px 6px; }
+        .typing-dot { animation: typing 1.4s infinite ease-in-out; }
+        @keyframes typing {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .model-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid transparent; background: #F8FAFC; }
+        .model-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(37, 99, 235, 0.1); }
+        .model-card.selected { border-color: #2563EB; background: linear-gradient(135deg, #EFF6FF 0%, #F5F3FF 100%); box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.1); }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .pre-line { white-space: pre-wrap; line-height: 1.7; }
+        .input-focus:focus { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+        .scroll-smooth { scroll-behavior: smooth; }
+        code { background: #E2E8F0; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.95em; color: #1E40AF; }
+        pre { background: #1E293B; color: #E2E8F0; padding: 12px; border-radius: 8px; overflow-x: auto; margin: 8px 0; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+        /* ===== CHẾ ĐỘ TỐI ===== */
+        html.dark { color-scheme: dark; }
+        html.dark body { background: linear-gradient(135deg, #0B1120 0%, #0F172A 50%, #062B2A 100%); background-attachment: fixed; color: #E2E8F0; }
+        html.dark .glass { background: rgba(15, 23, 42, 0.8); border-color: rgba(51, 65, 85, 0.6); }
+        html.dark .bg-white { background-color: #1E293B; }
+        html.dark .bg-neutral-50, html.dark .bg-neutral-50\/50 { background-color: #0F172A; }
+        html.dark .bg-neutral-100 { background-color: #334155; }
+        html.dark .bg-neutral-200 { background-color: #334155; }
+        html.dark .border-white\/80, html.dark .border-white\/50 { border-color: #334155; }
+        html.dark .border-neutral-100, html.dark .border-neutral-200 { border-color: #334155; }
+        html.dark .text-neutral-800, html.dark .text-neutral-700 { color: #E2E8F0; }
+        html.dark .text-neutral-600, html.dark .text-neutral-500 { color: #94A3B8; }
+        html.dark .text-primary { color: #60A5FA; }
+        html.dark input[type="text"], html.dark input[type="password"] { background-color: #0F172A; color: #E2E8F0; border-color: #334155; }
+        html.dark input::placeholder { color: #64748B; }
+        html.dark .model-card { background: #0F172A; }
+        html.dark .model-card.selected { background: linear-gradient(135deg, #172554 0%, #2E1065 100%); border-color: #3B82F6; }
+        html.dark .radio-indicator { border-color: #475569; }
+        html.dark .bg-amber-50 { background-color: rgba(120, 53, 15, 0.3); }
+        html.dark .bg-amber-50\/80 { background-color: rgba(120, 53, 15, 0.3); border-color: rgba(180, 83, 9, 0.4); }
+        html.dark .bg-green-50\/80 { background-color: rgba(6, 78, 59, 0.35); border-color: rgba(5, 150, 105, 0.4); }
+        html.dark .text-amber-700, html.dark .text-amber-800 { color: #FCD34D; }
+        html.dark .text-green-700 { color: #6EE7B7; }
+        html.dark .bg-green-100 { background-color: rgba(6, 78, 59, 0.5); }
+        html.dark .bg-blue-100 { background-color: rgba(30, 58, 138, 0.5); }
+        html.dark .bg-green-100.text-green-700 { color: #6EE7B7; }
+        html.dark .bg-blue-100.text-blue-700 { color: #93C5FD; }
+        html.dark #settings-btn, html.dark #theme-btn { background-color: #1E293B; border-color: #334155; color: #E2E8F0; }
+        html.dark #close-modal:hover { background-color: #334155; }
+        html.dark code { background: #334155; color: #93C5FD; }
+        html.dark pre { background: #020617; border: 1px solid #334155; }
+        html.dark ::-webkit-scrollbar-thumb { background: #475569; }
+        html.dark ::-webkit-scrollbar-thumb:hover { background: #64748B; }
+    </style>
+</head>
+<body class="font-sans text-neutral-800 min-h-screen flex flex-col scroll-smooth">
+    <!-- Header -->
+    <header class="glass sticky top-0 z-40 border-b border-white/50 shadow-sm">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl gradient-main flex items-center justify-center text-white shadow-glow">
+                    <i class="fa fa-graduation-cap text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold gradient-text">AI Học Tập Thông Minh</h1>
+                    <p class="text-xs text-neutral-500 hidden sm:block">Hiểu nhanh hơn, nhớ lâu hơn</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="theme-btn" title="Chuyển giao diện Sáng / Tối" aria-label="Chuyển giao diện Sáng / Tối" class="flex items-center justify-center w-11 h-11 rounded-xl bg-white border border-neutral-200 hover:border-primary/50 hover:shadow-md transition-all text-neutral-700">
+                    <i id="theme-icon" class="fa fa-moon-o text-primary text-lg"></i>
+                </button>
+                <button id="settings-btn" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-neutral-200 hover:border-primary/50 hover:shadow-md transition-all text-sm font-medium text-neutral-700">
+                    <i class="fa fa-cog text-primary"></i>
+                    <span class="hidden sm:inline">Cấu Hình API</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Thanh trạng thái -->
+    <div id="status-bar" class="border-b py-2.5 px-4 text-center text-sm transition-all duration-300 bg-amber-50/80 border-amber-100">
+        <span id="status-text" class="text-amber-700 font-medium">
+            <i class="fa fa-exclamation-triangle mr-1.5"></i> Chưa cấu hình — Nhấn "Cấu Hình API" để bắt đầu
+        </span>
+    </div>
+
+    <!-- Modal Cấu Hình -->
+    <div id="api-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" id="modal-overlay"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4 overflow-y-auto">
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl my-4 overflow-hidden relative">
+                <div class="gradient-main text-white p-6">
+                    <h3 class="text-xl font-bold flex items-center gap-2">
+                        <i class="fa fa-key"></i> Chọn Model & Cấu Hình API
+                    </h3>
+                    <p class="text-blue-100 text-sm mt-1">Chọn nhà cung cấp AI miễn phí và nhập khóa để kết nối</p>
+                </div>
+
+                <div class="p-6">
+                    <!-- Tên gợi nhớ cho AI -->
+                    <div class="mb-6">
+                        <label for="ai-name" class="block font-semibold text-neutral-800 mb-2">🏷️ Tên gợi nhớ cho AI</label>
+                        <input type="text" id="ai-name" maxlength="24" placeholder="Ví dụ: Cô Mai, Thầy Bông, Bé Bi..."
+                            class="w-full p-3.5 border-2 border-neutral-200 rounded-xl input-focus focus:border-primary outline-none transition-all text-base">
+                        <p class="text-sm text-neutral-500 mt-2">Đặt tên thân thiện cho trợ lý — AI sẽ xưng hô và hiển thị bằng tên này (tối đa 24 ký tự).</p>
+                    </div>
+
+                    <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-xl mb-6">
+                        <p class="font-semibold text-amber-800 text-sm flex items-center gap-1.5">
+                            <i class="fa fa-lightbulb-o"></i> Gợi ý tốt nhất
+                        </p>
+                        <p class="text-amber-700 text-sm mt-1">
+                            Chọn <strong>Gemini Flash-Lite</strong> hoặc <strong>Groq Llama</strong> — hoàn toàn miễn phí, không cần thẻ tín dụng!
+                        </p>
+                    </div>
+
+                    <p class="font-semibold text-neutral-800 mb-3">📋 Chọn phiên bản AI miễn phí:</p>
+                    <div class="grid gap-3 mb-6">
+                        <label class="model-card rounded-xl p-4 cursor-pointer block">
+                            <input type="radio" name="model" value="gemini-flash-lite" class="hidden">
+                            <div class="flex items-start gap-3">
+                                <div class="w-5 h-5 mt-0.5 rounded-full border-2 border-neutral-300 flex items-center justify-center flex-shrink-0 radio-indicator">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-primary scale-0 transition-transform"></span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex flex-wrap justify-between items-start gap-2">
+                                        <span class="font-bold text-neutral-800">🔷 Google Gemini Flash-Lite</span>
+                                        <span class="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-medium">Khuyến nghị</span>
+                                    </div>
+                                    <p class="text-sm text-neutral-600 mt-1">✅ Miễn phí vĩnh viễn • Phản hồi nhanh • Hỗ trợ tiếng Việt tuyệt vời</p>
+                                    <p class="text-xs text-primary mt-1.5">
+                                        🔑 Lấy key miễn phí: <a href="https://aistudio.google.com/apikey" target="_blank" class="underline hover:text-primaryDark">aistudio.google.com/apikey</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="model-card rounded-xl p-4 cursor-pointer block">
+                            <input type="radio" name="model" value="groq-llama" class="hidden">
+                            <div class="flex items-start gap-3">
+                                <div class="w-5 h-5 mt-0.5 rounded-full border-2 border-neutral-300 flex items-center justify-center flex-shrink-0 radio-indicator">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-primary scale-0 transition-transform"></span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex flex-wrap justify-between items-start gap-2">
+                                        <span class="font-bold text-neutral-800">⚡ Groq — Llama 3.3 70B</span>
+                                        <span class="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full font-medium">Nhanh nhất</span>
+                                    </div>
+                                    <p class="text-sm text-neutral-600 mt-1">✅ Miễn phí • 30 yêu cầu/phút • Phản hồi tức thì</p>
+                                    <p class="text-xs text-primary mt-1.5">
+                                        🔑 Lấy key miễn phí: <a href="https://console.groq.com/keys" target="_blank" class="underline hover:text-primaryDark">console.groq.com/keys</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="model-card rounded-xl p-4 cursor-pointer block">
+                            <input type="radio" name="model" value="openrouter" class="hidden">
+                            <div class="flex items-start gap-3">
+                                <div class="w-5 h-5 mt-0.5 rounded-full border-2 border-neutral-300 flex items-center justify-center flex-shrink-0 radio-indicator">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-primary scale-0 transition-transform"></span>
+                                </div>
+                                <div class="flex-1">
+                                    <span class="font-bold text-neutral-800">🌐 OpenRouter — Nhiều Model</span>
+                                    <p class="text-sm text-neutral-600 mt-1">✅ 50 yêu cầu/ngày miễn phí • Qwen, DeepSeek, Gemma…</p>
+                                    <p class="text-xs text-primary mt-1.5">
+                                        🔑 Lấy key: <a href="https://openrouter.ai/keys" target="_blank" class="underline hover:text-primaryDark">openrouter.ai/keys</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="model-card rounded-xl p-4 cursor-pointer block">
+                            <input type="radio" name="model" value="deepseek" class="hidden">
+                            <div class="flex items-start gap-3">
+                                <div class="w-5 h-5 mt-0.5 rounded-full border-2 border-neutral-300 flex items-center justify-center flex-shrink-0 radio-indicator">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-primary scale-0 transition-transform"></span>
+                                </div>
+                                <div class="flex-1">
+                                    <span class="font-bold text-neutral-800">🧠 DeepSeek V4 Flash</span>
+                                    <p class="text-sm text-neutral-600 mt-1">✅ ~60 lượt/ngày miễn phí • Giải toán rất tốt</p>
+                                    <p class="text-xs text-primary mt-1.5">
+                                        🔑 Lấy key: <a href="https://platform.deepseek.com/api_keys" target="_blank" class="underline hover:text-primaryDark">platform.deepseek.com</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="model-card rounded-xl p-4 cursor-pointer block opacity-75">
+                            <input type="radio" name="model" value="openai" class="hidden">
+                            <div class="flex items-start gap-3">
+                                <div class="w-5 h-5 mt-0.5 rounded-full border-2 border-neutral-300 flex items-center justify-center flex-shrink-0 radio-indicator">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-primary scale-0 transition-transform"></span>
+                                </div>
+                                <div class="flex-1">
+                                    <span class="font-bold text-neutral-800">💬 OpenAI GPT</span>
+                                    <p class="text-sm text-warning mt-1">⚠️ Không có gói miễn phí — cần nạp tiền</p>
+                                    <p class="text-xs text-primary mt-1.5">
+                                        🔑 Lấy key: <a href="https://platform.openai.com/api-keys" target="_blank" class="underline hover:text-primaryDark">platform.openai.com</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block font-semibold text-neutral-800 mb-2">🔑 API Key</label>
+                        <input type="password" id="api-key" placeholder="Dán khóa API vào đây..." 
+                            class="w-full p-3.5 border-2 border-neutral-200 rounded-xl input-focus focus:border-primary outline-none transition-all text-base">
+                        <p id="key-hint" class="text-sm text-neutral-500 mt-2">Chọn model để xem hướng dẫn lấy key</p>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button id="save-api" class="flex-1 gradient-main text-white py-3.5 rounded-xl font-semibold hover:shadow-lg hover:shadow-primary/20 transition-all transform hover:-translate-y-0.5 active:translate-y-0">
+                            <i class="fa fa-save mr-2"></i> Lưu & Kết Nối
+                        </button>
+                        <button id="close-modal" class="px-5 py-3.5 border-2 border-neutral-200 rounded-xl font-medium hover:bg-neutral-50 transition-all">
+                            Đóng
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="flex-grow container mx-auto px-4 py-6 md:py-8">
+        <div class="max-w-3xl mx-auto">
+            <div id="welcome-section" class="mb-6 text-center">
+                <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold gradient-text mb-2">Trợ Lý Giải Thích Kiến Thức</h2>
+                <p class="text-neutral-600 max-w-lg mx-auto">Đặt câu hỏi bất kỳ — từ bài tập Toán, phân tích tác phẩm Văn học đến kiến thức Khoa học — AI sẽ giải thích dễ hiểu nhất cho bạn</p>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-card overflow-hidden flex flex-col border border-white/80" style="height: 70vh; min-height: 500px;">
+                <div id="chat-messages" class="flex-1 p-4 md:p-6 overflow-y-auto bg-neutral-50/50 space-y-4">
+                    <div class="flex gap-3 md:gap-4">
+                        <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl gradient-main flex items-center justify-center text-white flex-shrink-0 shadow-glow">
+                            <i class="fa fa-robot"></i>
+                        </div>
+                        <div class="bg-white p-4 md:p-5 chat-bubble-ai max-w-[88%] shadow-sm border border-neutral-100">
+                            <p class="font-bold text-primary mb-2">👋 Xin chào! Tôi là <span class="ai-name-label">AI Trợ Giúp</span></p>
+                            <p class="text-neutral-700 mb-2">Tôi có thể giải thích mọi kiến thức cho bạn một cách dễ hiểu nhất.</p>
+                            <p class="text-neutral-600 mb-3">Để bắt đầu, nhấn nút <strong class="text-primary">"Cấu Hình API"</strong> ở góc trên → đặt tên gợi nhớ cho tôi, chọn một model miễn phí → lấy key theo liên kết hướng dẫn → dán vào ô và Lưu nhé!</p>
+                            <div class="bg-neutral-50 rounded-lg p-3 text-sm text-neutral-600 border border-neutral-100">
+                                <p class="font-medium text-neutral-700 mb-1">💡 Ví dụ câu hỏi:</p>
+                                <ul class="space-y-1 text-neutral-500">
+                                    <li>• "Giải thích định luật Pythagoras với ví dụ cụ thể"</li>
+                                    <li>• "Tóm tắt nội dung và giá trị tác phẩm Tắt đèn"</li>
+                                    <li>• "Tại sao lá cây có màu xanh?"</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 border-t border-neutral-100 bg-white">
+                    <form id="chat-form" class="flex gap-3 items-center">
+                        <input type="text" id="user-input" placeholder="Đặt câu hỏi hoặc yêu cầu giải thích..." 
+                            class="flex-1 px-5 py-3.5 rounded-xl border-2 border-neutral-200 focus:outline-none focus:border-primary input-focus transition-all text-base" required>
+                        <button type="submit" id="send-btn" 
+                            class="w-11 h-11 rounded-xl flex items-center justify-center transition-all flex-shrink-0 bg-neutral-200 cursor-not-allowed text-neutral-400" disabled>
+                            <i class="fa fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-4 text-center text-sm text-neutral-500">
+        <p>© 2026 AI Học Tập Thông Minh — Hỗ trợ học tập mọi lúc, mọi nơi 💙</p>
+    </footer>
+
+    <script>
+        const MODELS = {
+            'gemini-flash-lite': {
+                name: 'Gemini Flash-Lite',
+                provider: 'gemini',
+                model: 'gemini-3.5-flash-lite',
+                endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent',
+                hint: '✅ Miễn phí vĩnh viễn | Lấy key tại: aistudio.google.com/apikey'
+            },
+            'groq-llama': {
+                name: 'Groq Llama 3.3 70B',
+                provider: 'groq',
+                model: 'llama-3.3-70b-versatile',
+                endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+                hint: '✅ Miễn phí | Nhanh nhất | Lấy key tại: console.groq.com/keys'
+            },
+            'openrouter': {
+                name: 'OpenRouter',
+                provider: 'openrouter',
+                model: 'qwen/qwen-2.5-72b-instruct:free',
+                endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+                hint: '✅ 50 lượt/ngày miễn phí | Lấy key tại: openrouter.ai/keys'
+            },
+            'deepseek': {
+                name: 'DeepSeek V4 Flash',
+                provider: 'deepseek',
+                model: 'deepseek-chat',
+                endpoint: 'https://api.deepseek.com/v1/chat/completions',
+                hint: '✅ ~60 lượt/ngày miễn phí | Lấy key tại: platform.deepseek.com'
+            },
+            'openai': {
+                name: 'OpenAI GPT',
+                provider: 'openai',
+                model: 'gpt-3.5-turbo',
+                endpoint: 'https://api.openai.com/v1/chat/completions',
+                hint: '⚠️ Không miễn phí — cần nạp tiền | Lấy key tại: platform.openai.com'
+            }
+        };
+
+        const DEFAULT_AI_NAME = 'AI Trợ Giúp';
+
+        function storageGet(key, fallback) {
+            try { const v = localStorage.getItem(key); return v === null ? fallback : v; } catch (e) { return fallback; }
+        }
+        function storageSet(key, value) {
+            try { localStorage.setItem(key, value); } catch (e) {}
+        }
+
+        let CONFIG = {
+            selectedModel: storageGet('selected_model', 'gemini-flash-lite'),
+            apiKey: storageGet('api_key', ''),
+            aiName: storageGet('ai_name', DEFAULT_AI_NAME) || DEFAULT_AI_NAME,
+            isConfigured: false
+        };
+
+        const modal = document.getElementById('api-modal');
+        const overlay = document.getElementById('modal-overlay');
+        const settingsBtn = document.getElementById('settings-btn');
+        const closeModal = document.getElementById('close-modal');
+        const saveBtn = document.getElementById('save-api');
+        const apiKeyInput = document.getElementById('api-key');
+        const aiNameInput = document.getElementById('ai-name');
+        const statusBar = document.getElementById('status-bar');
+        const statusText = document.getElementById('status-text');
+        const sendBtn = document.getElementById('send-btn');
+        const chatForm = document.getElementById('chat-form');
+        const userInput = document.getElementById('user-input');
+        const chatMessages = document.getElementById('chat-messages');
+        const keyHint = document.getElementById('key-hint');
+        const modelRadios = document.querySelectorAll('input[name="model"]');
+        const themeBtn = document.getElementById('theme-btn');
+        const themeIcon = document.getElementById('theme-icon');
+
+        // ===== GIAO DIỆN SÁNG / TỐI =====
+        function applyTheme(theme) {
+            const isDark = theme === 'dark';
+            document.documentElement.classList.toggle('dark', isDark);
+            themeIcon.className = isDark ? 'fa fa-sun-o text-warning text-lg' : 'fa fa-moon-o text-primary text-lg';
+            themeBtn.title = isDark ? 'Chuyển sang giao diện Sáng' : 'Chuyển sang giao diện Tối';
+        }
+
+        themeBtn.addEventListener('click', () => {
+            const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+            applyTheme(next);
+            storageSet('theme', next);
+        });
+
+        // ===== TÊN GỢI NHỚ CHO AI =====
+        function getAiName() {
+            return (CONFIG.aiName || '').trim() || DEFAULT_AI_NAME;
+        }
+
+        function refreshAiNameLabels() {
+            document.querySelectorAll('.ai-name-label').forEach(el => { el.textContent = getAiName(); });
+        }
+
+        function init() {
+            applyTheme(document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+            modelRadios.forEach(radio => {
+                radio.checked = radio.value === CONFIG.selectedModel;
+                updateModelCardStyle(radio);
+                radio.addEventListener('change', () => {
+                    modelRadios.forEach(r => updateModelCardStyle(r));
+                    updateKeyHint();
+                });
+            });
+            apiKeyInput.value = CONFIG.apiKey;
+            aiNameInput.value = CONFIG.aiName === DEFAULT_AI_NAME ? '' : CONFIG.aiName;
+            refreshAiNameLabels();
+            updateKeyHint();
+            checkConfigured();
+            updateStatus();
+        }
+
+        function updateModelCardStyle(radio) {
+            const label = radio.closest('label');
+            const dot = label.querySelector('.radio-indicator span');
+            label.classList.toggle('selected', radio.checked);
+            if (dot) dot.style.transform = radio.checked ? 'scale(1)' : 'scale(0)';
+        }
+
+        function updateKeyHint() {
+            const selected = document.querySelector('input[name="model"]:checked');
+            if (selected && MODELS[selected.value]) {
+                keyHint.textContent = MODELS[selected.value].hint;
+            }
+        }
+
+        function checkConfigured() {
+            CONFIG.isConfigured = !!(CONFIG.apiKey && CONFIG.selectedModel);
+        }
+
+        function updateStatus() {
+            if (CONFIG.isConfigured) {
+                const modelInfo = MODELS[CONFIG.selectedModel];
+                statusText.innerHTML = `<i class="fa fa-check-circle mr-1.5"></i> Đã kết nối: <strong>${escapeHtml(getAiName())}</strong> (${modelInfo.name}) — Sẵn sàng trả lời!`;
+                statusBar.className = 'border-b py-2.5 px-4 text-center text-sm transition-all duration-300 bg-green-50/80 border-green-100';
+                statusText.className = 'text-green-700 font-medium';
+                sendBtn.disabled = false;
+                sendBtn.className = 'w-11 h-11 rounded-xl flex items-center justify-center transition-all flex-shrink-0 gradient-main text-white hover:shadow-lg hover:shadow-primary/20 transform hover:-translate-y-0.5 active:translate-y-0';
+            } else {
+                statusText.innerHTML = `<i class="fa fa-exclamation-triangle mr-1.5"></i> Chưa cấu hình — Nhấn "Cấu Hình API" để bắt đầu`;
+                statusBar.className = 'border-b py-2.5 px-4 text-center text-sm transition-all duration-300 bg-amber-50/80 border-amber-100';
+                statusText.className = 'text-amber-700 font-medium';
+                sendBtn.disabled = true;
+                sendBtn.className = 'w-11 h-11 rounded-xl flex items-center justify-center transition-all flex-shrink-0 bg-neutral-200 cursor-not-allowed text-neutral-400';
+            }
+        }
+
+        settingsBtn.addEventListener('click', () => modal.classList.remove('hidden'));
+        const closeModalFunc = () => modal.classList.add('hidden');
+        closeModal.addEventListener('click', closeModalFunc);
+        overlay.addEventListener('click', closeModalFunc);
+
+        saveBtn.addEventListener('click', () => {
+            const selectedRadio = document.querySelector('input[name="model"]:checked');
+            const key = apiKeyInput.value.trim();
+            if (!selectedRadio) { alert('Vui lòng chọn một model!'); return; }
+            if (!key) { alert('Vui lòng nhập API Key!'); return; }
+            CONFIG.selectedModel = selectedRadio.value;
+            CONFIG.apiKey = key;
+            CONFIG.aiName = aiNameInput.value.trim() || DEFAULT_AI_NAME;
+            storageSet('selected_model', CONFIG.selectedModel);
+            storageSet('api_key', CONFIG.apiKey);
+            storageSet('ai_name', CONFIG.aiName);
+            checkConfigured();
+            updateStatus();
+            refreshAiNameLabels();
+            closeModalFunc();
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-20 right-4 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg z-50 flex items-center gap-2';
+            notification.innerHTML = '<i class="fa fa-check-circle"></i> Đã kết nối thành công!';
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        });
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const question = userInput.value.trim();
+            if (!question || !CONFIG.isConfigured) return;
+            addMessage(question, 'user');
+            userInput.value = '';
+            const loadingId = addLoading();
+            try {
+                const answer = await callAI(question);
+                removeLoading(loadingId);
+                addMessage(answer, 'ai');
+            } catch (err) {
+                removeLoading(loadingId);
+                addMessage(`❌ **Lỗi kết nối:** ${err.message}\n\n💡 **Cách khắc phục:**\n• Kiểm tra lại API Key đã dán đúng chưa\n• Kiểm tra hạn mức sử dụng của model\n• Thử chọn nhà cung cấp khác`, 'ai');
+                console.error(err);
+            }
+        });
+
+        async function callAI(question) {
+            const modelInfo = MODELS[CONFIG.selectedModel];
+            const systemPrompt = `Bạn là trợ lý AI hỗ trợ học tập tuyệt vời, thân thiện, dễ gần. Người dùng gọi bạn bằng cái tên "${getAiName()}" — hãy tự xưng bằng tên này khi phù hợp (ví dụ khi chào hỏi hoặc giới thiệu bản thân). Nhiệm vụ:
+- Giải thích kiến thức đơn giản, rõ ràng, phù hợp học sinh-sinh viên Việt Nam
+- Dùng ví dụ cụ thể, dễ liên hệ
+- Sử dụng cấu trúc rõ ràng
+- Luôn trả lời bằng tiếng Việt, trừ khi yêu cầu khác
+- Giọng văn thân thiện, kiên nhẫn, khuyến khích học tập`;
+
+            if (modelInfo.provider === 'gemini') {
+                const url = `${modelInfo.endpoint}?key=${CONFIG.apiKey}`;
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [
+                                { text: systemPrompt },
+                                { text: question }
+                            ]
+                        }]
+                    })
+                });
+                if (!res.ok) throw new Error(`Lỗi ${res.status} — Kiểm tra key hoặc hạn mức`);
+                const data = await res.json();
+                if (!data.candidates?.[0]?.content?.parts?.[0]?.text) throw new Error('Không nhận được phản hồi');
+                return data.candidates[0].content.parts[0].text;
+            } else {
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${CONFIG.apiKey}`
+                };
+                if (modelInfo.provider === 'openrouter') {
+                    headers['HTTP-Referer'] = window.location.href;
+                    headers['X-Title'] = 'AI Học Tập Thông Minh';
+                }
+                const res = await fetch(modelInfo.endpoint, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({
+                        model: modelInfo.model,
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: question }
+                        ],
+                        temperature: 0.7
+                    })
+                });
+                if (!res.ok) throw new Error(`Lỗi ${res.status}`);
+                const data = await res.json();
+                return data.choices[0].message.content;
+            }
+        }
+
+        // === HÀM XỬ LÝ HIỂN THỊ ===
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatContent(text) {
+            // Bước 1: Tránh xử lý bên trong khối mã
+            const codeBlocks = [];
+            let protectedText = text.replace(/```([\s\S]*?)```/g, (match) => {
+                codeBlocks.push(match);
+                return `__CODE_BLOCK_${codeBlocks.length - 1}__`;
+            });
+            protectedText = protectedText.replace(/`([^`]+)`/g, (match) => {
+                codeBlocks.push(match);
+                return `__INLINE_CODE_${codeBlocks.length - 1}__`;
+            });
+
+            // Bước 2: Escape toàn bộ nội dung còn lại
+            let result = escapeHtml(protectedText);
+
+            // Bước 3: Áp dụng định dạng **in đậm**
+            result = result.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+            // Bước 4: Khôi phục khối mã
+            result = result.replace(/__CODE_BLOCK_(\d+)__/g, (_, idx) => {
+                const code = codeBlocks[parseInt(idx)];
+                if (code.startsWith('```')) {
+                    const content = code.slice(3, -3).trim();
+                    return `<pre>${escapeHtml(content)}</pre>`;
+                }
+                return `<code>${escapeHtml(code.slice(1, -1))}</code>`;
+            });
+            result = result.replace(/__INLINE_CODE_(\d+)__/g, (_, idx) => {
+                const code = codeBlocks[parseInt(idx)];
+                return `<code>${escapeHtml(code.slice(1, -1))}</code>`;
+            });
+
+            // Bước 5: Xuống dòng
+            result = result.replace(/\n/g, '<br>');
+
+            return result;
+        }
+
+        function addMessage(content, sender) {
+            const div = document.createElement('div');
+            div.className = `flex gap-3 md:gap-4 ${sender === 'user' ? 'justify-end' : ''}`;
+            if (sender === 'user') {
+                div.innerHTML = `
+                    <div class="gradient-main text-white p-4 chat-bubble-user max-w-[88%] shadow-md pre-line">
+                        ${escapeHtml(content).replace(/\n/g, '<br>')}
+                    </div>
+                    <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-neutral-100 flex items-center justify-center flex-shrink-0">
+                        <i class="fa fa-user text-neutral-500"></i>
+                    </div>
+                `;
+            } else {
+                div.innerHTML = `
+                    <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl gradient-main flex items-center justify-center text-white flex-shrink-0 shadow-glow">
+                        <i class="fa fa-robot"></i>
+                    </div>
+                    <div class="bg-white p-4 md:p-5 chat-bubble-ai max-w-[88%] shadow-sm border border-neutral-100">
+                        <p class="font-bold text-primary mb-2">${escapeHtml(getAiName())}</p>
+                        <div class="text-neutral-700">${formatContent(content)}</div>
+                    </div>
+                `;
+            }
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addLoading() {
+            const id = 'load-' + Date.now();
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = 'flex gap-3 md:gap-4';
+            div.innerHTML = `
+                <div class="w-9 h-9 md:w-10 md:h-10 rounded-xl gradient-main flex items-center justify-center text-white flex-shrink-0 shadow-glow">
+                    <i class="fa fa-robot"></i>
+                </div>
+                <div class="bg-white p-4 md:p-5 chat-bubble-ai shadow-sm border border-neutral-100">
+                    <p class="font-bold text-primary mb-2">${escapeHtml(getAiName())} đang suy nghĩ...</p>
+                    <div class="flex gap-1.5 items-center">
+                        <span class="typing-dot w-2.5 h-2.5 bg-neutral-400 rounded-full" style="animation-delay:0s"></span>
+                        <span class="typing-dot w-2.5 h-2.5 bg-neutral-400 rounded-full" style="animation-delay:0.2s"></span>
+                        <span class="typing-dot w-2.5 h-2.5 bg-neutral-400 rounded-full" style="animation-delay:0.4s"></span>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return id;
+        }
+
+        function removeLoading(id) { document.getElementById(id)?.remove(); }
+
+        init();
+    </script>
+</body>
+</html>
